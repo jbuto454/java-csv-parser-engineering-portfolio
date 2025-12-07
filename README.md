@@ -27,8 +27,6 @@ This documentation breaks down a Java application that processes Philadelphia ci
 
 ### 3. Technical Deep Dives
 - **Custom CSV Parser**: State machine design for handling quoted fields and escapes
-- **API Integration Pattern**: Fallback strategy from local files to remote API
-- **Memoization Implementation**: Caching strategy for expensive calculations
 
 ### 4. Code Samples & Concepts
 - **Illustrative Examples**: Clean-room code demonstrating key techniques

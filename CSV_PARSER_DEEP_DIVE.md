@@ -60,69 +60,6 @@ stateDiagram-v2
 | QUOTE_ESCAPE | `,` | Field complete, start next | NORMAL |
 | QUOTE_ESCAPE | `\n` | Field complete, row complete | NORMAL (next row) |
 
-### Illustrative Implementation
-
-```java
-private List<String> parseNextRow() throws IOException {
-    List<String> fields = new ArrayList<>();
-    fieldBuilder.setLength(0);  // Reset StringBuilder
-    boolean inQuotes = false;
-
-    int ch;
-    while ((ch = readChar()) != -1) {
-        char c = (char) ch;
-        
-        if (inQuotes) {
-            if (c == '"') {
-                // Peek ahead: is this an escaped quote or end of field?
-                int next = peekChar();
-                if (next == '"') {
-                    // Escaped quote: append literal " and consume both
-                    fieldBuilder.append('"');
-                    readChar();  // Consume the second quote
-                } else {
-                    // End of quoted section
-                    inQuotes = false;
-                }
-            } else {
-                // Inside quotes: everything is literal (including commas)
-                fieldBuilder.append(c);
-            }
-        } else {
-            // Normal mode
-            switch (c) {
-                case ',':
-                    fields.add(fieldBuilder.toString());
-                    fieldBuilder.setLength(0);
-                    break;
-                case '"':
-                    if (fieldBuilder.isEmpty()) {
-                        inQuotes = true;
-                    } else {
-                        throw new IOException("Quote in middle of unquoted field");
-                    }
-                    break;
-                case '\r':
-                case '\n':
-                    fields.add(fieldBuilder.toString());
-                    return fields;  // Row complete
-                default:
-                    fieldBuilder.append(c);
-            }
-        }
-    }
-    
-    // Handle EOF
-    if (!fieldBuilder.isEmpty() || !fields.isEmpty()) {
-        fields.add(fieldBuilder.toString());
-        return fields;
-    }
-    return null;  // No more data
-}
-```
-
----
-
 ## Buffered I/O Strategy
 
 Reading one character at a time from disk is catastrophically slow. The parser implements manual buffering for control over read-ahead behavior.
@@ -160,48 +97,6 @@ flowchart LR
 | Manual buffer + `peekChar()` | ~125 | Direct array access, peek without consuming |
 
 The key insight: I needed `peekChar()` to look ahead without consuming the character (for escape detection). With `BufferedReader`, this requires `mark()`/`reset()` calls. With manual buffering, it's just `buffer[bufferPos]` vs `buffer[bufferPos++]`.
-
-### Buffer Management Code
-
-```java
-private static final int BUFFER_SIZE = 16384;  // 16KB - typical disk block size
-
-private char[] buffer = new char[BUFFER_SIZE];
-private int bufferPos = 0;
-private int bufferEnd = 0;
-private boolean endOfFile = false;
-
-private int readChar() throws IOException {
-    if (bufferPos >= bufferEnd) {
-        if (endOfFile) return -1;
-        
-        // Refill buffer
-        bufferEnd = reader.read(buffer, 0, BUFFER_SIZE);
-        if (bufferEnd == -1) {
-            endOfFile = true;
-            return -1;
-        }
-        bufferPos = 0;
-    }
-    return buffer[bufferPos++];  // Return AND advance
-}
-
-private int peekChar() throws IOException {
-    if (bufferPos >= bufferEnd) {
-        if (endOfFile) return -1;
-        
-        bufferEnd = reader.read(buffer, 0, BUFFER_SIZE);
-        if (bufferEnd == -1) {
-            endOfFile = true;
-            return -1;
-        }
-        bufferPos = 0;
-    }
-    return buffer[bufferPos];  // Return WITHOUT advancing
-}
-```
-
----
 
 ## Data Structure Optimization
 

@@ -28,8 +28,7 @@ This documentation breaks down a Java application that processes Philadelphia ci
 ### 3. Technical Deep Dives
 - **Custom CSV Parser**: State machine design for handling quoted fields and escapes
 
-### 4. Code Samples & Concepts
-- **Illustrative Examples**: Clean-room code demonstrating key techniques
+### 4. Concepts
 - **Design Decisions**: Why certain architectures were chosen over alternatives
 
 ## Key Technical Skills Demonstrated

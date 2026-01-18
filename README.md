@@ -43,7 +43,6 @@ This documentation breaks down a Java application that processes Philadelphia ci
 ## How to Engage with This Portfolio
 1. **Review Architecture Diagrams**: Understand the system design
 2. **Read Performance Analysis**: See the impact of optimization decisions
-3. **Examine Code Samples**: View illustrative implementations
-4. **Request a Live Walkthrough**: I'm available for technical discussions about any aspect
+3. **Request a Live Walkthrough**: I'm available for technical discussions about any aspect
 
 *Note: This repository contains analysis, documentation, and illustrative examples only. The complete academic implementation remains private per university policy.*
